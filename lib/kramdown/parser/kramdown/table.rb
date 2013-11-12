@@ -66,8 +66,10 @@ module Kramdown
               if i % 2 == 1
                 (cells.empty? ? cells : cells.last) << str
               else
-                reset_env(:src => StringScanner.new(str))
                 root = new_element(:root)
+                l_src = StringScanner.new(str)
+                l_src.line_number_offset = @src.current_line_number
+                reset_env(:src => l_src)
                 parse_spans(root, nil, [:codespan])
 
                 root.children.each do |c|
@@ -110,8 +112,10 @@ module Kramdown
 
         # Parse all lines of the table with the code span parser
         env = save_env
-        reset_env(:src => StringScanner.new(extract_string(orig_pos...(@src.pos-1), @src)))
         root = Element.new(:root)
+        l_src = StringScanner.new(extract_string(orig_pos...(@src.pos-1), @src))
+        l_src.line_number_offset = @src.current_line_number
+        reset_env(:src => l_src)
         parse_spans(root, nil, [:codespan])
         restore_env(env)
 

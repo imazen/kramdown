@@ -67,6 +67,7 @@ module Kramdown
         reset_env
 
         @root.options[:abbrev_defs] = {}
+        @root.options[:location] = 1
         @alds = {}
         @link_defs = {}
         @options[:link_defs].each {|k,v| @link_defs[normalize_link_id(k)] = v}
@@ -118,7 +119,13 @@ module Kramdown
       # Parse all block-level elements in +text+ into the element +el+.
       def parse_blocks(el, text = nil)
         @stack.push([@tree, @src, @block_ial])
-        @tree, @src, @block_ial = el, (text.nil? ? @src : StringScanner.new(text)), nil
+        if text.nil?
+          l_src = @src
+        else
+          l_src = StringScanner.new(text)
+          l_src.line_number_offset = el.options[:location]  if el.options[:location]
+        end
+        @tree, @src, @block_ial = el, l_src, nil
 
         status = catch(:stop_block_parsing) do
           while !@src.eos?
@@ -148,7 +155,9 @@ module Kramdown
         element.children.map! do |child|
           if child.type == :raw_text
             last_blank = nil
-            reset_env(:src => StringScanner.new(child.value), :text_type => :text)
+            l_src = StringScanner.new(child.value)
+            l_src.line_number_offset = element.options[:location]  if element.options[:location]
+            reset_env(:src => l_src, :text_type => :text)
             parse_spans(child)
             child.children
           elsif child.type == :eob
