@@ -15,11 +15,12 @@ module Kramdown
 
       # Parse the blank line at the current postition.
       def parse_blank_line
+        start_line_number = @src.current_line_number
         @src.pos += @src.matched_size
         if @tree.children.last && @tree.children.last.type == :blank
           @tree.children.last.value << @src.matched
         else
-          @tree.children << new_block_el(:blank, @src.matched)
+          @tree.children << new_block_el(:blank, @src.matched, nil, :location => start_line_number)
         end
         true
       end

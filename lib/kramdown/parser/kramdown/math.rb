@@ -17,6 +17,7 @@ module Kramdown
 
       # Parse the math block at the current location.
       def parse_block_math
+        start_line_number = @src.current_line_number
         if !after_block_boundary?
           return false
         elsif @src[1]
@@ -28,7 +29,7 @@ module Kramdown
         @src.pos += @src.matched_size
         data = @src[2]
         if before_block_boundary?
-          @tree.children << new_block_el(:math, data, nil, :category => :block)
+          @tree.children << new_block_el(:math, data, nil, :category => :block, :location => start_line_number)
           true
         else
           @src.pos = orig_pos
