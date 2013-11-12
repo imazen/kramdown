@@ -125,3 +125,18 @@ module Kramdown
   end
 
 end
+
+# Patch StringScanner to add #current_line_number
+# This patch adds line number information for current scan position to StringScanner
+require 'strscan'
+class StringScanner
+
+  attr_accessor :line_number_offset
+
+  # Returns the line number for current charpos.
+  # NOTE: Expects \n as line endings.
+  def current_line_number
+    string[0..pos].count("\n") + line_number_offset
+  end
+
+end
