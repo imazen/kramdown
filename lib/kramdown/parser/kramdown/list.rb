@@ -61,7 +61,7 @@ module Kramdown
             eob_found = true
             break
           elsif @src.scan(list_start_re)
-            item = Element.new(:li)
+            item = new_element(:li)
             item.value, indentation, content_re, lazy_re, indent_re = parse_first_list_line(@src[1].length, @src[2])
             list.children << item
 
@@ -96,7 +96,7 @@ module Kramdown
 
         last = nil
         list.children.each do |it|
-          temp = Element.new(:temp)
+          temp = new_element(:temp)
           parse_blocks(temp, it.value)
           it.children = temp.children
           it.value = nil
@@ -147,8 +147,8 @@ module Kramdown
           first_as_para = true
         end
         para.children.first.value.split(/\n/).each do |term|
-          el = Element.new(:dt)
-          el.children << Element.new(:raw_text, term)
+          el = new_element(:dt)
+          el.children << new_element(:raw_text, term)
           deflist.children << el
         end
         deflist.options[:ial] = para.options[:ial]
@@ -159,7 +159,7 @@ module Kramdown
         last_is_blank = false
         while !@src.eos?
           if @src.scan(def_start_re)
-            item = Element.new(:dd)
+            item = new_element(:dd)
             item.options[:first_as_para] = first_as_para
             item.value, indentation, content_re, lazy_re, indent_re = parse_first_list_line(@src[1].length, @src[2])
             deflist.children << item

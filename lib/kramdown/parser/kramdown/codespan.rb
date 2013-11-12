@@ -30,7 +30,7 @@ module Kramdown
             text = text[1..-1] if text[0..0] == ' '
             text = text[0..-2] if text[-1..-1] == ' '
           end
-          @tree.children << Element.new(:codespan, text)
+          @tree.children << new_element(:codespan, text)
         else
           @src.pos = reset_pos
           add_text(result)

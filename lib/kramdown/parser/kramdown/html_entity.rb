@@ -17,10 +17,10 @@ module Kramdown
       def parse_html_entity
         @src.pos += @src.matched_size
         begin
-          @tree.children << Element.new(:entity, ::Kramdown::Utils::Entities.entity(@src[1] || (@src[2] && @src[2].to_i) || @src[3].hex),
+          @tree.children << new_element(:entity, ::Kramdown::Utils::Entities.entity(@src[1] || (@src[2] && @src[2].to_i) || @src[3].hex),
                                         nil, :original => @src.matched)
         rescue ::Kramdown::Error
-          @tree.children << Element.new(:entity, ::Kramdown::Utils::Entities.entity('amp'))
+          @tree.children << new_element(:entity, ::Kramdown::Utils::Entities.entity('amp'))
           add_text(@src.matched[1..-1])
         end
       end

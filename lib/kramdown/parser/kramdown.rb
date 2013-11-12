@@ -43,7 +43,7 @@ module Kramdown
     #
     #      def parse_erb_tags
     #        @src.pos += @src.matched_size
-    #        @tree.children << Element.new(:raw, @src.matched)
+    #        @tree.children << new_element(:raw, @src.matched)
     #      end
     #      define_parser(:erb_tags, ERB_TAGS_START, '<%')
     #
@@ -256,7 +256,7 @@ module Kramdown
       # Create a new block-level element, taking care of applying a preceding block IAL if it
       # exists. This method should always be used for creating a block-level element!
       def new_block_el(*args)
-        el = Element.new(*args)
+        el = new_element(*args)
         el.options[:ial] = @block_ial if @block_ial && el.type != :blank && el.type != :eob
         el
       end
