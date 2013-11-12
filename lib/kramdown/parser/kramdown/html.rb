@@ -66,11 +66,11 @@ module Kramdown
       # Parse the HTML at the current position as block-level HTML.
       def parse_block_html
         if result = @src.scan(HTML_COMMENT_RE)
-          @tree.children << Element.new(:xml_comment, result, nil, :category => :block)
+          @tree.children << new_element(:xml_comment, result, nil, :category => :block)
           @src.scan(TRAILING_WHITESPACE)
           true
         elsif result = @src.scan(HTML_INSTRUCTION_RE)
-          @tree.children << Element.new(:xml_pi, result, nil, :category => :block)
+          @tree.children << new_element(:xml_pi, result, nil, :category => :block)
           @src.scan(TRAILING_WHITESPACE)
           true
         else
@@ -101,9 +101,9 @@ module Kramdown
       # Parse the HTML at the current position as span-level HTML.
       def parse_span_html
         if result = @src.scan(HTML_COMMENT_RE)
-          @tree.children << Element.new(:xml_comment, result, nil, :category => :span)
+          @tree.children << new_element(:xml_comment, result, nil, :category => :span)
         elsif result = @src.scan(HTML_INSTRUCTION_RE)
-          @tree.children << Element.new(:xml_pi, result, nil, :category => :span)
+          @tree.children << new_element(:xml_pi, result, nil, :category => :span)
         elsif result = @src.scan(HTML_TAG_CLOSE_RE)
           warning("Found invalidly used HTML closing tag for '#{@src[1]}'")
           add_text(result)
@@ -131,7 +131,7 @@ module Kramdown
             end
           end
 
-          el = Element.new(:html_element, tag_name, attrs, :category => :span,
+          el = new_element(:html_element, tag_name, attrs, :category => :span,
                            :content_model => (do_parsing ? :span : :raw), :is_closed => !!@src[4])
           @tree.children << el
           stop_re = /<\/#{Regexp.escape(tag_name)}\s*>/i

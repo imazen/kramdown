@@ -39,7 +39,7 @@ module Kramdown
         else
           @tree.children << new_block_el(:p)
           result.lstrip!
-          @tree.children.last.children << Element.new(@text_type, result)
+          @tree.children.last.children << new_element(@text_type, result)
         end
         true
       end

@@ -23,13 +23,13 @@ module Kramdown
         @src.pos += @src.matched_size
         val = TYPOGRAPHIC_SYMS_SUBST[@src.matched]
         if val.kind_of?(Symbol)
-          @tree.children << Element.new(:typographic_sym, val)
+          @tree.children << new_element(:typographic_sym, val)
         elsif @src.matched == '\\<<'
-          @tree.children << Element.new(:entity, ::Kramdown::Utils::Entities.entity('lt'))
-          @tree.children << Element.new(:entity, ::Kramdown::Utils::Entities.entity('lt'))
+          @tree.children << new_element(:entity, ::Kramdown::Utils::Entities.entity('lt'))
+          @tree.children << new_element(:entity, ::Kramdown::Utils::Entities.entity('lt'))
         else
-          @tree.children << Element.new(:entity, ::Kramdown::Utils::Entities.entity('gt'))
-          @tree.children << Element.new(:entity, ::Kramdown::Utils::Entities.entity('gt'))
+          @tree.children << new_element(:entity, ::Kramdown::Utils::Entities.entity('gt'))
+          @tree.children << new_element(:entity, ::Kramdown::Utils::Entities.entity('gt'))
         end
       end
       define_parser(:typographic_syms, TYPOGRAPHIC_SYMS_RE, '--|\\.\\.\\.|(?:\\\\| )?(?:<<|>>)')

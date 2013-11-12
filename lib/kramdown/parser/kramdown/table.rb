@@ -36,7 +36,7 @@ module Kramdown
 
         add_container = lambda do |type, force|
           if !has_footer || type != :tbody || force
-            cont = Element.new(type)
+            cont = new_element(type)
             cont.children, rows = rows, []
             table.children << cont
           end
@@ -57,7 +57,7 @@ module Kramdown
             add_container.call(:tbody, true) if !rows.empty?
             has_footer = true
           elsif @src.scan(TABLE_ROW_LINE)
-            trow = Element.new(:tr)
+            trow = new_element(:tr)
 
             # parse possible code spans on the line and correctly split the line into cells
             env = save_env
@@ -67,7 +67,7 @@ module Kramdown
                 (cells.empty? ? cells : cells.last) << str
               else
                 reset_env(:src => StringScanner.new(str))
-                root = Element.new(:root)
+                root = new_element(:root)
                 parse_spans(root, nil, [:codespan])
 
                 root.children.each do |c|
@@ -92,8 +92,8 @@ module Kramdown
             cells.shift if leading_pipe && cells.first.strip.empty?
             cells.pop if cells.last.strip.empty?
             cells.each do |cell_text|
-              tcell = Element.new(:td)
-              tcell.children << Element.new(:raw_text, cell_text.strip)
+              tcell = new_element(:td)
+              tcell.children << new_element(:raw_text, cell_text.strip)
               trow.children << tcell
             end
             columns = [columns, cells.length].max
@@ -144,7 +144,7 @@ module Kramdown
         table.children.each do |kind|
           kind.children.each do |row|
             (columns - row.children.length).times do
-              row.children << Element.new(:td)
+              row.children << new_element(:td)
             end
           end
         end

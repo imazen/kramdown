@@ -25,8 +25,8 @@ module Kramdown
             children = []
             lines = child.value.split(/\n(?=.)/)
             lines.each_with_index do |line, index|
-              children << Element.new(:text, (index > 0 ? "\n#{line}" : line))
-              children << Element.new(:br) if index < lines.size - 1
+              children << new_element(:text, (index > 0 ? "\n#{line}" : line))
+              children << new_element(:br) if index < lines.size - 1
             end
             children
           elsif child.type == :html_element

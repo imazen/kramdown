@@ -20,7 +20,7 @@ module Kramdown
         abbrev_text.strip!
         warning("Duplicate abbreviation ID '#{abbrev_id}' - overwriting") if @root.options[:abbrev_defs][abbrev_id]
         @root.options[:abbrev_defs][abbrev_id] = abbrev_text
-        @tree.children << Element.new(:eob, :abbrev_def)
+        @tree.children << new_element(:eob, :abbrev_def)
         true
       end
       define_parser(:abbrev_definition, ABBREV_DEFINITION_START)
@@ -44,9 +44,9 @@ module Kramdown
                   temp << strscan.scan(/\W|^/)
                   abbr = strscan.scan(regexps.first)
                 end
-                result << Element.new(:text, temp) << Element.new(:abbreviation, abbr)
+                result << new_element(:text, temp) << new_element(:abbreviation, abbr)
               end
-              result << Element.new(:text, strscan.rest)
+              result << new_element(:text, strscan.rest)
             else
               child
             end

@@ -25,7 +25,7 @@ module Kramdown
       def parse_autolink
         @src.pos += @src.matched_size
         href = (@src[2].nil? ? "mailto:#{@src[1]}" : @src[1])
-        el = Element.new(:a, nil, {'href' => href})
+        el = new_element(:a, nil, {'href' => href})
         add_text(@src[1].sub(/^mailto:/, ''), el)
         @tree.children << el
       end

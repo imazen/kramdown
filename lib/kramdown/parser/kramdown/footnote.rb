@@ -21,11 +21,11 @@ module Kramdown
       def parse_footnote_definition
         @src.pos += @src.matched_size
 
-        el = Element.new(:footnote_def)
+        el = new_element(:footnote_def)
         parse_blocks(el, @src[2].gsub(INDENT, ''))
         warning("Duplicate footnote name '#{@src[1]}' - overwriting") if @footnotes[@src[1]]
         (@footnotes[@src[1]] = {})[:content] = el
-        @tree.children << Element.new(:eob, :footnote_def)
+        @tree.children << new_element(:eob, :footnote_def)
         true
       end
       define_parser(:footnote_definition, FOOTNOTE_DEFINITION_START)
@@ -39,7 +39,7 @@ module Kramdown
         fn_def = @footnotes[@src[1]]
         if fn_def
           fn_def[:marker] ||= []
-          fn_def[:marker].push(Element.new(:footnote, fn_def[:content], nil, :name => @src[1]))
+          fn_def[:marker].push(new_element(:footnote, fn_def[:content], nil, :name => @src[1]))
           fn_def[:stack] = [@stack.map {|s| s.first}, @tree, fn_def[:marker]].flatten.compact
           @tree.children << fn_def[:marker].last
         else

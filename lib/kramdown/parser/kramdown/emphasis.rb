@@ -27,7 +27,7 @@ module Kramdown
         end
 
         sub_parse = lambda do |delim, elem|
-          el = Element.new(elem)
+          el = new_element(elem)
           stop_re = /#{Regexp.escape(delim)}/
           found = parse_spans(el, stop_re) do
             (@src.pre_match[-1, 1] !~ /\s/) &&

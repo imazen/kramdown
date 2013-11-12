@@ -49,7 +49,7 @@ module Kramdown
       def initialize(source, options)
         @source = source
         @options = Kramdown::Options.merge(options)
-        @root = Element.new(:root, nil, nil, :encoding => (source.encoding rescue nil))
+        @root = new_element(:root, nil, nil, :encoding => (source.encoding rescue nil))
         @warnings = []
         @text_type = :text
       end
@@ -98,7 +98,7 @@ module Kramdown
         if tree.children.last && tree.children.last.type == type
           tree.children.last.value << text
         elsif !text.empty?
-          tree.children << Element.new(type, text)
+          tree.children << new_element(type, text)
         end
       end
 
@@ -118,6 +118,17 @@ module Kramdown
           result = strscan.string[range]
         end
         result
+      end
+
+      # Factory method to instantiate a new element and to record location
+      # information in its options.
+      def new_element(*args)
+        el = Element.new(*args)
+        if :span == Element.category(el) && @src.line_number_offset
+          # Store location info on :span level el
+          el.options[:location] = @src.current_line_number
+        end
+        el
       end
 
     end
