@@ -26,7 +26,7 @@ module Kramdown
         return false if !after_block_boundary?
 
         orig_pos = @src.pos
-        table = new_block_el(:table, nil, nil, :alignment => [])
+        table = new_block_el(:table, nil, nil, :alignment => [], :location => @src.current_line_number)
         leading_pipe = (@src.check(TABLE_LINE) =~ /^\s*\|/)
         @src.scan(TABLE_SEP_LINE)
 
@@ -36,7 +36,7 @@ module Kramdown
 
         add_container = lambda do |type, force|
           if !has_footer || type != :tbody || force
-            cont = new_element(type)
+            cont = new_element(type, nil, nil, :location => 0)
             cont.children, rows = rows, []
             table.children << cont
           end
@@ -57,7 +57,7 @@ module Kramdown
             add_container.call(:tbody, true) if !rows.empty?
             has_footer = true
           elsif @src.scan(TABLE_ROW_LINE)
-            trow = new_element(:tr)
+            trow = new_element(:tr, nil, nil, :location => 0)
 
             # parse possible code spans on the line and correctly split the line into cells
             env = save_env
@@ -66,10 +66,10 @@ module Kramdown
               if i % 2 == 1
                 (cells.empty? ? cells : cells.last) << str
               else
-                root = new_element(:root)
                 l_src = StringScanner.new(str)
                 l_src.line_number_offset = @src.current_line_number
                 reset_env(:src => l_src)
+                root = new_element(:root, nil, nil, :location => 0)
                 parse_spans(root, nil, [:codespan])
 
                 root.children.each do |c|
@@ -94,8 +94,8 @@ module Kramdown
             cells.shift if leading_pipe && cells.first.strip.empty?
             cells.pop if cells.last.strip.empty?
             cells.each do |cell_text|
-              tcell = new_element(:td)
-              tcell.children << new_element(:raw_text, cell_text.strip)
+              tcell = new_element(:td, nil, nil, :location => 0)
+              tcell.children << new_element(:raw_text, cell_text.strip, nil, :location => 0)
               trow.children << tcell
             end
             columns = [columns, cells.length].max
@@ -112,10 +112,10 @@ module Kramdown
 
         # Parse all lines of the table with the code span parser
         env = save_env
-        root = Element.new(:root)
         l_src = StringScanner.new(extract_string(orig_pos...(@src.pos-1), @src))
         l_src.line_number_offset = @src.current_line_number
         reset_env(:src => l_src)
+        root = new_element(:root, nil, nil, :location => 0)
         parse_spans(root, nil, [:codespan])
         restore_env(env)
 
@@ -148,7 +148,7 @@ module Kramdown
         table.children.each do |kind|
           kind.children.each do |row|
             (columns - row.children.length).times do
-              row.children << new_element(:td)
+              row.children << new_element(:td, nil, nil, :location => 0)
             end
           end
         end

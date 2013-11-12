@@ -19,13 +19,14 @@ module Kramdown
 
       # Parse the foot note definition at the current location.
       def parse_footnote_definition
+        start_line_number = @src.current_line_number
         @src.pos += @src.matched_size
 
-        el = new_element(:footnote_def)
+        el = new_element(:footnote_def, nil, nil, :location => start_line_number)
         parse_blocks(el, @src[2].gsub(INDENT, ''))
         warning("Duplicate footnote name '#{@src[1]}' - overwriting") if @footnotes[@src[1]]
         (@footnotes[@src[1]] = {})[:content] = el
-        @tree.children << new_element(:eob, :footnote_def)
+        @tree.children << new_element(:eob, :footnote_def, nil, :location => start_line_number)
         true
       end
       define_parser(:footnote_definition, FOOTNOTE_DEFINITION_START)
