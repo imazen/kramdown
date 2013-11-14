@@ -38,7 +38,7 @@ module Kramdown
             if child.value =~ regexps.first
               result = []
               strscan = StringScanner.new(child.value)
-              strscan.line_number_offset = el.options[:location]
+              strscan.start_line_number = el.options[:location]
               while temp = strscan.scan_until(regexps.last)
                 abbr = strscan.scan(regexps.first) # begin of line case of abbr with \W char as first one
                 if abbr.nil?
