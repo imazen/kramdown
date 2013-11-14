@@ -126,7 +126,7 @@ module Kramdown
       # information in its options.
       def new_element(*args)
         el = Element.new(*args)
-        if :span == Element.category(el) && @src.line_number_offset
+        if :span == Element.category(el) && @src.start_line_number
           # Store location info on :span level el
           el.options[:location] = @src.current_line_number
         end
