@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 # This patch adds line number information for current scan position to
-# StringScanner. It also adds line_number_offset for nested StringScanners.
+# StringScanner. It also adds a start_line_number override for nested
+# StringScanners.
 require 'strscan'
 class StringScanner
 
-  # Use :line_number_offset to handle nested StringScanners that scan a sub-string
+  # Set start_line_number to handle nested StringScanners that scan a sub-string
   # of the source document. Kramdown uses this e.g., for span level parsers.
-  attr_accessor :line_number_offset
+  attr_accessor :start_line_number
 
   # To make this unicode (multibyte) aware, we have to use charpos which was
   # added in Ruby version 2.0.0.
@@ -25,8 +26,11 @@ class StringScanner
 
   # Returns the line number for current charpos.
   # NOTE: Requires that all line endings are normalized to '\n'
+  # NOTE: Normally we'd have to add one to the count of newlines to get the
+  # correct line number. However we add the one implicitly by having a one-based
+  # start_line_number.
   def current_line_number
-    string[0..best_pos].count("\n") + (line_number_offset || 1)
+    string[0..best_pos].count("\n") + (start_line_number || 1)
   end
 
 end

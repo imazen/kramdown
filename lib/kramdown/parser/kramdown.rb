@@ -122,7 +122,7 @@ module Kramdown
           l_src = @src
         else
           l_src = StringScanner.new(text)
-          l_src.line_number_offset = el.options[:location]  if el.options[:location]
+          l_src.start_line_number = el.options[:location]  if el.options[:location]
         end
         @tree, @src, @block_ial = el, l_src, nil
 
@@ -155,7 +155,7 @@ module Kramdown
           if child.type == :raw_text
             last_blank = nil
             l_src = StringScanner.new(child.value)
-            l_src.line_number_offset = element.options[:location]  if element.options[:location]
+            l_src.start_line_number = element.options[:location]  if element.options[:location]
             reset_env(:src => l_src, :text_type => :text)
             parse_spans(child)
             child.children
