@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'minitest/autorun'
 require 'kramdown'
 
@@ -148,11 +150,6 @@ a para
       doc = Kramdown::Document.new(test_string.strip)
       check_element_for_location(doc.root)
     end
-  end
-
-  it "Records line number 1 for root" do
-    doc = Kramdown::Document.new("some text")
-    doc.root.options[:location].must_equal 1
   end
 
 end

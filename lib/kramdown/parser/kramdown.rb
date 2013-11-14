@@ -67,7 +67,6 @@ module Kramdown
         reset_env
 
         @root.options[:abbrev_defs] = {}
-        @root.options[:location] = 1
         @alds = {}
         @link_defs = {}
         @options[:link_defs].each {|k,v| @link_defs[normalize_link_id(k)] = v}
