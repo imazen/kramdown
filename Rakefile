@@ -197,6 +197,13 @@ EOF
       s.rubyforge_project = 'kramdown'
     end
 
+
+    task :gemspec => [ 'CONTRIBUTERS', 'VERSION', 'man/man1/kramdown.1'] do 
+      print "Generating Gemspec\n"
+      contents = spec.to_ruby
+      File.open("kramdown.gemspec", 'w+') {|f| f.puts(contents)}
+    end 
+
     Gem::PackageTask.new(spec) do |pkg|
       pkg.need_zip = true
       pkg.need_tar = true
@@ -287,5 +294,7 @@ EOF
   end
 
 end
+
+task :gemspec => ['dev:gemspec']
 
 task :clobber => ['dev:clobber']
