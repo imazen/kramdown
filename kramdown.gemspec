@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Thomas Leitner"]
-  s.date = "2013-12-09"
+  s.date = "2013-12-13"
   s.description = "kramdown is yet-another-markdown-parser but fast, pure Ruby,\nusing a strict syntax definition and supporting several common extensions.\n"
   s.email = "t_leitner@gmx.at"
   s.executables = ["kramdown"]
