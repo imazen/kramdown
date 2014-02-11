@@ -100,7 +100,12 @@ module Kramdown
         if tree.children.last && tree.children.last.type == type
           tree.children.last.value << text
         elsif !text.empty?
-          tree.children << Element.new(type, text)
+          options_hash = if(l = tree.options[:location])
+            { :location => l }
+          else
+            nil
+          end
+          tree.children << Element.new(type, text, nil, options_hash)
         end
       end
 

@@ -162,7 +162,7 @@ module Kramdown
             add_text(@src[subst])
           else
             val = SQ_SUBSTS[[subst, @src[subst.to_s[-1,1].to_i]]] || subst
-            @tree.children << Element.new(:smart_quote, val)
+            @tree.children << Element.new(:smart_quote, val, nil, :location => @src.current_line_number)
           end
         end
       end

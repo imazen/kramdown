@@ -19,7 +19,7 @@ module Kramdown
         if @tree.children.last && @tree.children.last.type == :blank
           @tree.children.last.value << @src.matched
         else
-          @tree.children << new_block_el(:blank, @src.matched)
+          @tree.children << new_block_el(:blank, @src.matched, nil, :location => @src.current_line_number)
         end
         true
       end
