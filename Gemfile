@@ -1,4 +1,4 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 gem 'minitest', '~> 5.0'
 gem 'coderay', '~> 1.0.0'
