@@ -9,7 +9,7 @@ GIT
       ttfunk (~> 1.0.3)
 
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     Ascii85 (1.0.2)
     afm (0.2.0)
