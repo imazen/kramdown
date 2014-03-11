@@ -71,7 +71,7 @@ module Kramdown
         end
 
         ext = @src[1]
-        opts = {}
+        opts = { :location => start_line_number }
         body = nil
         parse_attribute_list(@src[2] || '', opts)
 
@@ -95,7 +95,8 @@ module Kramdown
       def handle_extension(name, opts, body, type)
         case name
         when 'comment'
-          @tree.children << Element.new(:comment, body, nil, :category => type) if body.kind_of?(String)
+          o = opts.merge(:category => type) # to get location information on comment element
+          @tree.children << Element.new(:comment, body, nil, o) if body.kind_of?(String)
           true
         when 'nomarkdown'
           @tree.children << Element.new(:raw, body, nil, :category => type, :type => opts['type'].to_s.split(/\s+/)) if body.kind_of?(String)
