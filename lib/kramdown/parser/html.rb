@@ -34,12 +34,12 @@ module Kramdown
         HTML_ENTITY_RE = /&([\w:][\-\w\.:]*);|&#(\d+);|&\#x([0-9a-fA-F]+);/
 
         HTML_CONTENT_MODEL_BLOCK = %w{address applet article aside button blockquote body
-             dd div dl fieldset figure figcaption footer form header hgroup iframe li map menu nav
-              noscript object section td}
+             dd details div dl fieldset figure figcaption footer form header hgroup iframe li map menu nav
+              noscript object section summary td}
         HTML_CONTENT_MODEL_SPAN  = %w{a abbr acronym b bdo big button cite caption del dfn dt em
-             h1 h2 h3 h4 h5 h6 i ins kbd label legend optgroup p q rb rbc
-             rp rt rtc ruby samp select small span strong sub sup summary th tt var}
-        HTML_CONTENT_MODEL_RAW   = %w{script style math option textarea pre code}
+             h1 h2 h3 h4 h5 h6 i ins label legend optgroup p q rb rbc
+             rp rt rtc ruby select small span strong sub sup th tt}
+        HTML_CONTENT_MODEL_RAW   = %w{script style math option textarea pre code kbd samp var}
         # The following elements are also parsed as raw since they need child elements that cannot
         # be expressed using kramdown syntax: colgroup table tbody thead tfoot tr ul ol
 
@@ -50,9 +50,10 @@ module Kramdown
 
         # Some HTML elements like script belong to both categories (i.e. are valid in block and
         # span HTML) and don't appear therefore!
+        # script, textarea
         HTML_SPAN_ELEMENTS = %w{a abbr acronym b big bdo br button cite code del dfn em i img input
                               ins kbd label option q rb rbc rp rt rtc ruby samp select small span
-                              strong sub sup textarea tt var}
+                              strong sub sup tt u var}
         HTML_BLOCK_ELEMENTS = %w{address article aside applet body button blockquote caption col colgroup dd div dl dt fieldset
                                figcaption footer form h1 h2 h3 h4 h5 h6 header hgroup hr html head iframe legend menu
                                li map nav ol optgroup p pre section summary table tbody td th thead tfoot tr ul}
@@ -74,17 +75,18 @@ module Kramdown
         # (first parameter is the created element; the second parameter is +true+ if the HTML
         # element is already closed, ie. contains no body; the third parameter specifies whether the
         # body - and the end tag - need to be handled in case closed=false).
-        def handle_html_start_tag # :yields: el, closed, handle_body
+        def handle_html_start_tag(line = nil) # :yields: el, closed, handle_body
           name = @src[1].downcase
           closed = !@src[4].nil?
           attrs = Utils::OrderedHash.new
           @src[2].scan(HTML_ATTRIBUTE_RE).each {|attr,sep,val| attrs[attr.downcase] = val || ""}
 
           el = Element.new(:html_element, name, attrs, :category => :block)
+          el.options[:location] = line if line
           @tree.children << el
 
           if !closed && HTML_ELEMENTS_WITHOUT_BODY.include?(el.value)
-            warning("The HTML tag '#{el.value}' cannot have any content - auto-closing it")
+            warning("The HTML tag '#{el.value}' on line #{line} cannot have any content - auto-closing it")
             closed = true
           end
           if name == 'script' || name == 'style'
@@ -127,17 +129,22 @@ module Kramdown
           while !@src.eos? && !done
             if result = @src.scan_until(HTML_RAW_START)
               add_text(result, @tree, :text)
+              line = @src.current_line_number
               if result = @src.scan(HTML_COMMENT_RE)
-                @tree.children << Element.new(:xml_comment, result, nil, :category => :block)
+                @tree.children << Element.new(:xml_comment, result, nil, :category => :block, :location => line)
               elsif result = @src.scan(HTML_INSTRUCTION_RE)
-                @tree.children << Element.new(:xml_pi, result, nil, :category => :block)
+                @tree.children << Element.new(:xml_pi, result, nil, :category => :block, :location => line)
               elsif @src.scan(HTML_TAG_RE)
-                handle_html_start_tag(&block)
+                if method(:handle_html_start_tag).arity == 1
+                  handle_html_start_tag(line, &block)
+                else
+                  handle_html_start_tag(&block) # DEPRECATED: method needs to accept line number in 2.0
+                end
               elsif @src.scan(HTML_TAG_CLOSE_RE)
                 if @tree.value == @src[1].downcase
                   done = true
                 else
-                  warning("Found invalidly used HTML closing tag for '#{@src[1].downcase}' - ignoring it")
+                  warning("Found invalidly used HTML closing tag for '#{@src[1].downcase}' on line #{line} - ignoring it")
                 end
               else
                 add_text(@src.getch, @tree, :text)
@@ -145,7 +152,7 @@ module Kramdown
             else
               add_text(@src.rest, @tree, :text)
               @src.terminate
-              warning("Found no end tag for '#{@tree.value}' - auto-closing it") if @tree.type == :html_element
+              warning("Found no end tag for '#{@tree.value}' on line #{@tree.options[:location]} - auto-closing it") if @tree.type == :html_element
               done = true
             end
           end
@@ -330,6 +337,10 @@ module Kramdown
           el.children.each {|c| extract_text(c, raw)}
         end
 
+        def convert_textarea(el)
+          process_html_element(el, true, true)
+        end
+
         def convert_a(el)
           if el.attr['href']
             set_basics(el, :a)
@@ -420,7 +431,7 @@ module Kramdown
                 if td.attr['style']
                   td.attr['style'].slice!(/(?:;\s*)?text-align:\s+(center|left|right)/)
                   td.attr.delete('style') if td.attr['style'].strip.empty?
-                  $1.to_sym
+                  $1 ? $1.to_sym : :default
                 else
                   :default
                 end

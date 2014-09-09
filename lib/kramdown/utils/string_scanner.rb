@@ -23,19 +23,14 @@ module Kramdown
         @previous_line_number = @start_line_number
       end
 
-      # To make this unicode (multibyte) aware, we have to use #charpos which was added in Ruby
-      # version 2.0.0.
+      # Sets the byte position of the scan pointer.
       #
-      # This method will work with older versions of Ruby, however it will report incorrect line
-      # numbers if the scanned string contains multibyte characters.
-      if instance_methods.include?(:charpos)
-        def best_pos
-          charpos
-        end
-      else
-        def best_pos
-          pos
-        end
+      # Note: This also resets some internal variables, so always use pos= when setting the position
+      # and don't use any other method for that!
+      def pos=(pos)
+        super
+        @previous_line_number = @start_line_number
+        @previous_pos = 0
       end
 
       # Returns the line number for current charpos.
@@ -51,7 +46,7 @@ module Kramdown
         old_pos = pos + 1
         @previous_line_number += 1 while strscan.skip_until(/\n/) && strscan.pos <= old_pos
 
-        @previous_pos = (eos? ? best_pos : best_pos + 1)
+        @previous_pos = (eos? ? pos : pos + 1)
         @previous_line_number
       end
 
